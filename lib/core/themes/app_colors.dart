@@ -13,6 +13,9 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.error,
     required this.success,
     required this.warning,
+    required this.background,
+    required this.border,
+    required this.textTertiary,
   });
 
   /// Surface 배경색
@@ -39,6 +42,15 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 경고 상태 표시 색상
   final Color warning;
 
+  /// 배경 색상 (다크 모드용)
+  final Color background;
+
+  /// 테두리/구분선 색상
+  final Color border;
+
+  /// 비활성 텍스트 색상
+  final Color textTertiary;
+
   /// 밝은 테마용 기본 컬러 정의
   static const light = AppColors(
     surface: Color(0xFFF5F5F5),
@@ -49,6 +61,9 @@ class AppColors extends ThemeExtension<AppColors> {
     error: Color(0xFFB00020),
     success: Color(0xFF4CAF50),
     warning: Color(0xFFFFC107),
+    background: Color(0xFFFFFFFF),
+    border: Color(0xFFE0E0E0),
+    textTertiary: Color(0xFF9E9E9E),
   );
 
   /// 다크 테마용 기본 컬러 정의
@@ -61,6 +76,9 @@ class AppColors extends ThemeExtension<AppColors> {
     error: Color(0xFFCF6679),
     success: Color(0xFF81C784),
     warning: Color(0xFFFFD54F),
+    background: Color(0xFF101922),
+    border: Color(0xFF3B4754),
+    textTertiary: Color(0xFF9DABB9),
   );
 
   @override
@@ -73,6 +91,9 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? error,
     Color? success,
     Color? warning,
+    Color? background,
+    Color? border,
+    Color? textTertiary,
   }) => AppColors(
     surface: surface ?? this.surface,
     textPrimary: textPrimary ?? this.textPrimary,
@@ -82,6 +103,9 @@ class AppColors extends ThemeExtension<AppColors> {
     error: error ?? this.error,
     success: success ?? this.success,
     warning: warning ?? this.warning,
+    background: background ?? this.background,
+    border: border ?? this.border,
+    textTertiary: textTertiary ?? this.textTertiary,
   );
 
   @override
@@ -98,6 +122,9 @@ class AppColors extends ThemeExtension<AppColors> {
       error: Color.lerp(error, other.error, t)!,
       success: Color.lerp(success, other.success, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
+      background: Color.lerp(background, other.background, t)!,
+      border: Color.lerp(border, other.border, t)!,
+      textTertiary: Color.lerp(textTertiary, other.textTertiary, t)!,
     );
   }
 }
