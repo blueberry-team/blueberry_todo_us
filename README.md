@@ -70,7 +70,7 @@ lib/
     └── github/         # API 연동 예제
         ├── controllers/
         ├── models/
-        └── services/
+        └── repository/
 ```
 
 ## 주요 패키지
