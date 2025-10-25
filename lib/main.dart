@@ -37,6 +37,7 @@ void main() {
 }
 
 /// 앱의 루트 위젯
+/// 치킨톤 너무 노잼임
 class MyApp extends ConsumerWidget {
   /// MyApp 생성자
   const MyApp({super.key});
