@@ -41,7 +41,11 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
     try {
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
-        return androidInfo.id;
+        // 에뮬레이터 구분을 위해 여러 정보 조합
+        final uniqueId = '${androidInfo.id}_${androidInfo.device}_${androidInfo.fingerprint}';
+        // ignore: avoid_print
+        print('Android Device ID: $uniqueId');
+        return uniqueId;
       } else if (Platform.isIOS) {
         final iosInfo = await deviceInfo.iosInfo;
         return iosInfo.identifierForVendor ?? _generateFallbackId();
