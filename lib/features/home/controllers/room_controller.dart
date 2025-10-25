@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:template/features/home/models/room.dart';
 import 'package:template/features/home/repositories/room_repository.dart';
@@ -52,33 +50,17 @@ class RoomController {
   /// Repository 참조
   RoomRepository get _repository => _ref.read(roomRepositoryProvider);
 
-  /// 랜덤 아바타 색상 생성
-  int _generateRandomColor() {
-    final random = Random();
-    final colors = [
-      0xFFE57373, // Red
-      0xFFBA68C8, // Purple
-      0xFF64B5F6, // Blue
-      0xFF4DD0E1, // Cyan
-      0xFF81C784, // Green
-      0xFFFFD54F, // Amber
-      0xFFFF8A65, // Deep Orange
-      0xFF90A4AE, // Blue Grey
-    ];
-    return colors[random.nextInt(colors.length)];
-  }
-
   /// 새로운 방을 생성합니다.
   ///
   /// [roomName] 방 이름
   /// [memberName] 생성자 이름
+  /// [avatarColor] 생성자 아바타 색상
   /// 생성된 방 객체를 반환합니다.
   Future<Room> createRoom({
     required String roomName,
     required String memberName,
+    required int avatarColor,
   }) async {
-    final avatarColor = _generateRandomColor();
-
     final room = await _repository.createRoom(
       name: roomName,
       memberName: memberName,
@@ -95,17 +77,18 @@ class RoomController {
   ///
   /// [roomCode] 6자리 방 코드
   /// [memberName] 참가자 이름
+  /// [avatarColor] 참가자 아바타 색상
   /// 참가한 방 객체를 반환합니다. 방을 찾지 못하면 null을 반환합니다.
   Future<Room?> joinRoomByCode({
     required String roomCode,
     required String memberName,
+    required int avatarColor,
   }) async {
     final room = await _repository.findRoomByCode(roomCode);
     if (room == null) {
       return null;
     }
 
-    final avatarColor = _generateRandomColor();
     await _repository.joinRoom(
       roomId: room.id,
       memberName: memberName,

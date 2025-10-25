@@ -5,6 +5,7 @@ import 'package:template/core/themes/app_colors.dart';
 import 'package:template/core/themes/app_typography.dart';
 import 'package:template/features/home/controllers/room_controller.dart';
 import 'package:template/features/todous/controllers/shared_todo_controller.dart';
+import 'package:template/features/todous/widgets/active_users_widget.dart';
 import 'package:template/features/todous/widgets/shared_todo_item_widget.dart';
 
 /// 공유 TodoList 스크린
@@ -171,33 +172,49 @@ class SharedTodoListScreen extends ConsumerWidget {
                     letterSpacing: -0.27,
                   ),
                 ),
-                roomAsync.when(
-                  data: (room) => OutlinedButton.icon(
-                    onPressed: room != null
-                        ? () => _showShareDialog(context, room.roomCode)
-                        : null,
-                    icon: const Icon(Icons.share, size: 16),
-                    label: Text(
-                      'Share Link',
-                      style: AppTypography.caption.copyWith(
-                        fontWeight: FontWeight.w700,
-                        height: 1.5,
-                        letterSpacing: 0.21,
-                      ),
+                Row(
+                  children: [
+                    // 활성 사용자 표시
+                    roomAsync.when(
+                      data: (room) => room != null && room.members.isNotEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: ActiveUsersWidget(members: room.members),
+                            )
+                          : const SizedBox.shrink(),
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
                     ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: colors.textPrimary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
+                    // 공유 버튼
+                    roomAsync.when(
+                      data: (room) => OutlinedButton.icon(
+                        onPressed: room != null
+                            ? () => _showShareDialog(context, room.roomCode)
+                            : null,
+                        icon: const Icon(Icons.share, size: 16),
+                        label: Text(
+                          'Share Link',
+                          style: AppTypography.caption.copyWith(
+                            fontWeight: FontWeight.w700,
+                            height: 1.5,
+                            letterSpacing: 0.21,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: colors.textPrimary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
                     ),
-                  ),
-                  loading: () => const SizedBox.shrink(),
-                  error: (_, __) => const SizedBox.shrink(),
+                  ],
                 ),
               ],
             ),

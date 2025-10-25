@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:template/core/themes/app_colors.dart';
 import 'package:template/core/themes/app_typography.dart';
 import 'package:template/features/home/controllers/room_controller.dart';
+import 'package:template/features/user_profile/controllers/user_profile_controller.dart';
 
 /// 방 생성 다이얼로그를 표시합니다.
 Future<dynamic> showCreateRoomDialog(BuildContext context, WidgetRef ref) {
@@ -23,21 +24,29 @@ class CreateRoomDialog extends ConsumerStatefulWidget {
 
 class _CreateRoomDialogState extends ConsumerState<CreateRoomDialog> {
   final _roomNameController = TextEditingController();
-  final _memberNameController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _roomNameController.dispose();
-    _memberNameController.dispose();
     super.dispose();
   }
 
   Future<void> _createRoom() async {
     final roomName = _roomNameController.text.trim();
-    final memberName = _memberNameController.text.trim();
 
-    if (roomName.isEmpty || memberName.isEmpty) {
+    if (roomName.isEmpty) {
+      return;
+    }
+
+    // 사용자 프로필 가져오기
+    final userProfile = ref.read(currentUserProfileProvider).value;
+    if (userProfile == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Loading user profile...')),
+        );
+      }
       return;
     }
 
@@ -49,13 +58,14 @@ class _CreateRoomDialogState extends ConsumerState<CreateRoomDialog> {
       final controller = ref.read(roomControllerProvider);
       final room = await controller.createRoom(
         roomName: roomName,
-        memberName: memberName,
+        memberName: userProfile.nickname,
+        avatarColor: userProfile.avatarColor,
       );
 
       if (mounted) {
         Navigator.of(context).pop(room);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to create room: $e')),
@@ -79,35 +89,18 @@ class _CreateRoomDialogState extends ConsumerState<CreateRoomDialog> {
         'Create New Project',
         style: AppTypography.title.copyWith(color: colors.textPrimary),
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _roomNameController,
-            decoration: InputDecoration(
-              labelText: 'Project Name',
-              labelStyle: TextStyle(color: colors.textSecondary),
-              border: const OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: colors.primary),
-              ),
-            ),
-            enabled: !_isLoading,
+      content: TextField(
+        controller: _roomNameController,
+        decoration: InputDecoration(
+          labelText: 'Project Name',
+          labelStyle: TextStyle(color: colors.textSecondary),
+          border: const OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: colors.primary),
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _memberNameController,
-            decoration: InputDecoration(
-              labelText: 'Your Name',
-              labelStyle: TextStyle(color: colors.textSecondary),
-              border: const OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: colors.primary),
-              ),
-            ),
-            enabled: !_isLoading,
-          ),
-        ],
+        ),
+        enabled: !_isLoading,
+        autofocus: true,
       ),
       actions: [
         TextButton(

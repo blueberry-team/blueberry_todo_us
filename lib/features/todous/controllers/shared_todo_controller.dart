@@ -3,6 +3,7 @@ import 'package:template/features/home/controllers/room_controller.dart';
 import 'package:template/features/todo/models/todo_item.dart';
 import 'package:template/features/todous/models/shared_todo_item.dart';
 import 'package:template/features/todous/repositories/shared_todo_repository.dart';
+import 'package:template/features/user_profile/controllers/user_profile_controller.dart';
 
 /// 현재 방의 공유 할일 목록 Provider
 final sharedTodoProvider = StreamProvider<List<SharedTodoItem>>((ref) {
@@ -35,9 +36,9 @@ class SharedTodoController {
   /// 새로운 할 일을 추가합니다.
   ///
   /// [title] 할 일 제목
-  /// [user] 생성자 정보 (선택사항)
   /// [title]이 비어있으면 추가하지 않습니다.
-  Future<void> add(String title, {User? user}) async {
+  /// 현재 사용자 정보를 자동으로 추가합니다.
+  Future<void> add(String title) async {
     final roomId = _ref.read(currentRoomIdProvider);
     if (roomId == null) {
       throw Exception('No active room');
@@ -46,6 +47,15 @@ class SharedTodoController {
     if (title.isEmpty) {
       return;
     }
+
+    // 현재 사용자 프로필 가져오기
+    final userProfile = _ref.read(currentUserProfileProvider).value;
+    final user = userProfile != null
+        ? User(
+            name: userProfile.nickname,
+            avatarColor: userProfile.avatarColor,
+          )
+        : null;
 
     final newItem = SharedTodoItem(
       id: '', // Firestore가 자동 생성
@@ -61,12 +71,21 @@ class SharedTodoController {
   /// 할 일의 완료 상태를 토글합니다.
   ///
   /// [id]에 해당하는 항목을 찾아 완료 상태를 변경합니다.
-  /// [user]가 제공되면 완료한 사용자 정보를 저장합니다.
-  Future<void> toggle(String id, {User? user}) async {
+  /// 현재 사용자 정보를 자동으로 추가합니다.
+  Future<void> toggle(String id) async {
     final todo = await _repository.getTodo(id);
     if (todo == null) {
       return;
     }
+
+    // 현재 사용자 프로필 가져오기
+    final userProfile = _ref.read(currentUserProfileProvider).value;
+    final user = userProfile != null
+        ? User(
+            name: userProfile.nickname,
+            avatarColor: userProfile.avatarColor,
+          )
+        : null;
 
     final updated = todo.copyWith(
       isCompleted: !todo.isCompleted,

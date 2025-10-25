@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:template/core/themes/app_colors.dart';
 import 'package:template/core/themes/app_typography.dart';
 import 'package:template/features/home/controllers/room_controller.dart';
+import 'package:template/features/user_profile/controllers/user_profile_controller.dart';
 
 /// 방 참가 다이얼로그를 표시합니다.
 Future<dynamic> showJoinRoomDialog(BuildContext context, WidgetRef ref) {
@@ -23,22 +24,30 @@ class JoinRoomDialog extends ConsumerStatefulWidget {
 
 class _JoinRoomDialogState extends ConsumerState<JoinRoomDialog> {
   final _roomCodeController = TextEditingController();
-  final _memberNameController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
 
   @override
   void dispose() {
     _roomCodeController.dispose();
-    _memberNameController.dispose();
     super.dispose();
   }
 
   Future<void> _joinRoom() async {
     final roomCode = _roomCodeController.text.trim();
-    final memberName = _memberNameController.text.trim();
 
-    if (roomCode.isEmpty || memberName.isEmpty) {
+    if (roomCode.isEmpty) {
+      return;
+    }
+
+    // 사용자 프로필 가져오기
+    final userProfile = ref.read(currentUserProfileProvider).value;
+    if (userProfile == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Loading user profile...')),
+        );
+      }
       return;
     }
 
@@ -51,7 +60,8 @@ class _JoinRoomDialogState extends ConsumerState<JoinRoomDialog> {
       final controller = ref.read(roomControllerProvider);
       final room = await controller.joinRoomByCode(
         roomCode: roomCode,
-        memberName: memberName,
+        memberName: userProfile.nickname,
+        avatarColor: userProfile.avatarColor,
       );
 
       if (room == null) {
@@ -84,38 +94,21 @@ class _JoinRoomDialogState extends ConsumerState<JoinRoomDialog> {
         'Join Existing Project',
         style: AppTypography.title.copyWith(color: colors.textPrimary),
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _roomCodeController,
-            decoration: InputDecoration(
-              labelText: 'Room Code (6 digits)',
-              labelStyle: TextStyle(color: colors.textSecondary),
-              border: const OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: colors.primary),
-              ),
-              errorText: _errorMessage,
-            ),
-            keyboardType: TextInputType.number,
-            maxLength: 6,
-            enabled: !_isLoading,
+      content: TextField(
+        controller: _roomCodeController,
+        decoration: InputDecoration(
+          labelText: 'Room Code (6 digits)',
+          labelStyle: TextStyle(color: colors.textSecondary),
+          border: const OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: colors.primary),
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _memberNameController,
-            decoration: InputDecoration(
-              labelText: 'Your Name',
-              labelStyle: TextStyle(color: colors.textSecondary),
-              border: const OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: colors.primary),
-              ),
-            ),
-            enabled: !_isLoading,
-          ),
-        ],
+          errorText: _errorMessage,
+        ),
+        keyboardType: TextInputType.number,
+        maxLength: 6,
+        enabled: !_isLoading,
+        autofocus: true,
       ),
       actions: [
         TextButton(

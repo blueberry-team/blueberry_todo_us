@@ -59,19 +59,42 @@ class SharedTodoItemWidget extends StatelessWidget {
                   height: 1.5,
                 ),
               ),
+              if (item.createdBy != null) ...[
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(item.createdBy!.avatarColor),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Created by ${item.createdBy!.name}',
+                      style: AppTypography.caption.copyWith(
+                        color: colors.textTertiary,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               if (item.isCompleted && item.completedBy != null) ...[
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     Container(
-                      width: 20,
-                      height: 20,
+                      width: 16,
+                      height: 16,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Color(item.completedBy!.avatarColor),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Text(
                       'Completed by ${item.completedBy!.name}',
                       style: AppTypography.caption.copyWith(

@@ -5,6 +5,7 @@ import 'package:template/core/themes/app_typography.dart';
 import 'package:template/features/home/widgets/create_room_dialog.dart';
 import 'package:template/features/home/widgets/join_room_dialog.dart';
 import 'package:template/features/todous/screens/shared_todo_list_screen.dart';
+import 'package:template/features/user_profile/controllers/user_profile_controller.dart';
 
 /// Home 스크린
 class HomeScreen extends ConsumerWidget {
@@ -14,6 +15,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
+    final userProfileAsync = ref.watch(currentUserProfileProvider);
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -81,6 +83,39 @@ class HomeScreen extends ConsumerWidget {
                         height: 1.5,
                       ),
                       textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 사용자 닉네임 표시
+                    userProfileAsync.when(
+                      data: (profile) => profile != null
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(profile.avatarColor),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  profile.nickname,
+                                  style: AppTypography.body.copyWith(
+                                    color: colors.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                      loading: () => const CircularProgressIndicator(),
+                      error: (error, stack) => Text(
+                        'Failed to load profile',
+                        style: TextStyle(color: colors.error),
+                      ),
                     ),
                     const SizedBox(height: 24),
 
