@@ -24,7 +24,7 @@ class JoinRoomDialog extends ConsumerStatefulWidget {
 
 class _JoinRoomDialogState extends ConsumerState<JoinRoomDialog> {
   final _roomCodeController = TextEditingController();
-  bool _isLoading = false;
+  var _isLoading = false;
   String? _errorMessage;
 
   @override

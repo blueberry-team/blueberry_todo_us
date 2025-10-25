@@ -150,7 +150,7 @@ class SharedTodoListScreen extends ConsumerWidget {
             ),
           ),
           loading: () => const Text('Loading...'),
-          error: (_, __) => const Text('Error'),
+          error: (_, _) => const Text('Error'),
         ),
       ),
       body: Column(
@@ -183,7 +183,7 @@ class SharedTodoListScreen extends ConsumerWidget {
                             )
                           : const SizedBox.shrink(),
                       loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const SizedBox.shrink(),
+                      error: (_, _) => const SizedBox.shrink(),
                     ),
                     // 공유 버튼
                     roomAsync.when(
@@ -212,7 +212,7 @@ class SharedTodoListScreen extends ConsumerWidget {
                         ),
                       ),
                       loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const SizedBox.shrink(),
+                      error: (_, _) => const SizedBox.shrink(),
                     ),
                   ],
                 ),

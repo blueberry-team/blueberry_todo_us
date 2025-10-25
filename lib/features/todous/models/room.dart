@@ -9,21 +9,6 @@ class Room {
     this.members = const [],
   });
 
-  /// 고유 식별자
-  final String id;
-
-  /// 방 이름
-  final String name;
-
-  /// 6자리 방 코드
-  final String roomCode;
-
-  /// 생성 시간
-  final DateTime createdAt;
-
-  /// 참가자 목록
-  final List<RoomMember> members;
-
   /// Firestore 문서를 Room으로 변환
   factory Room.fromFirestore(Map<String, dynamic> data, String id) {
     return Room(
@@ -38,6 +23,21 @@ class Room {
           [],
     );
   }
+
+  /// 고유 식별자
+  final String id;
+
+  /// 방 이름
+  final String name;
+
+  /// 6자리 방 코드
+  final String roomCode;
+
+  /// 생성 시간
+  final DateTime createdAt;
+
+  /// 참가자 목록
+  final List<RoomMember> members;
 
   /// Room 복사본 생성
   Room copyWith({

@@ -12,9 +12,12 @@ class CurrentRoomIdNotifier extends Notifier<String?> {
   @override
   String? build() => null;
 
+  /// 방 ID 조회
+  String? get roomId => state;
+
   /// 방 ID 설정
-  void setRoomId(String? roomId) {
-    state = roomId;
+  set roomId(String? value) {
+    state = value;
   }
 
   /// 방 나가기
@@ -34,9 +37,7 @@ final currentRoomProvider = StreamProvider<Room?>((ref) {
 });
 
 /// Room Controller Provider
-final roomControllerProvider = Provider<RoomController>((ref) {
-  return RoomController(ref);
-});
+final roomControllerProvider = Provider<RoomController>(RoomController.new);
 
 /// Room을 관리하는 컨트롤러
 ///
@@ -68,7 +69,7 @@ class RoomController {
     );
 
     // 생성된 방을 현재 방으로 설정
-    _ref.read(currentRoomIdProvider.notifier).setRoomId(room.id);
+    _ref.read(currentRoomIdProvider.notifier).roomId = room.id;
 
     return room;
   }
@@ -96,7 +97,7 @@ class RoomController {
     );
 
     // 참가한 방을 현재 방으로 설정
-    _ref.read(currentRoomIdProvider.notifier).setRoomId(room.id);
+    _ref.read(currentRoomIdProvider.notifier).roomId = room.id;
 
     return room;
   }

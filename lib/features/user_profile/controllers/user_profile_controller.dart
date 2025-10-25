@@ -10,8 +10,8 @@ import 'package:template/features/user_profile/repositories/user_profile_reposit
 /// 현재 사용자 프로필 Provider
 final currentUserProfileProvider =
     AsyncNotifierProvider<UserProfileNotifier, UserProfile?>(
-  UserProfileNotifier.new,
-);
+      UserProfileNotifier.new,
+    );
 
 /// 사용자 프로필을 관리하는 Notifier
 class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
@@ -24,11 +24,11 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
 
     // Firestore에서 기존 프로필 찾기
     final repository = ref.read(userProfileRepositoryProvider);
-    var profile = await repository.findByDeviceId(deviceId);
+    final profile = await repository.findByDeviceId(deviceId);
 
     // 프로필이 없으면 새로 생성
     if (profile == null) {
-      profile = await _createNewProfile(deviceId, repository);
+      return _createNewProfile(deviceId, repository);
     }
 
     return profile;
@@ -109,7 +109,9 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
   /// 닉네임 변경
   Future<void> updateNickname(String newNickname) async {
     final currentProfile = state.value;
-    if (currentProfile == null) return;
+    if (currentProfile == null) {
+      return;
+    }
 
     state = const AsyncValue.loading();
 
@@ -127,6 +129,6 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
   /// 프로필 새로고침
   Future<void> refresh() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => build());
+    state = await AsyncValue.guard(build);
   }
 }

@@ -7,7 +7,7 @@ final todoRepositoryProvider = Provider<TodoRepository>((ref) {
   return TodoRepository();
 });
 
-/// Todo 데이터의 Firestore CRUD 작업을 담당하는 Repository
+/// 할일 데이터의 Firestore CRUD 작업을 담당하는 Repository
 ///
 /// Firestore의 'todos' 컬렉션과 상호작용합니다.
 class TodoRepository {

@@ -24,7 +24,7 @@ class CreateRoomDialog extends ConsumerStatefulWidget {
 
 class _CreateRoomDialogState extends ConsumerState<CreateRoomDialog> {
   final _roomNameController = TextEditingController();
-  bool _isLoading = false;
+  var _isLoading = false;
 
   @override
   void dispose() {

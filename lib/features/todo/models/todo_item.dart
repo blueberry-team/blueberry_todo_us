@@ -8,6 +8,18 @@ class TodoItem {
     this.completedBy,
   });
 
+  /// Firestore 문서를 TodoItem으로 변환
+  factory TodoItem.fromFirestore(Map<String, dynamic> data, String id) {
+    return TodoItem(
+      id: id,
+      title: data['title'] as String,
+      isCompleted: data['isCompleted'] as bool? ?? false,
+      completedBy: data['completedBy'] != null
+          ? User.fromJson(data['completedBy'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
   /// 고유 식별자
   final String id;
 
@@ -35,18 +47,6 @@ class TodoItem {
     );
   }
 
-  /// Firestore 문서를 TodoItem으로 변환
-  factory TodoItem.fromFirestore(Map<String, dynamic> data, String id) {
-    return TodoItem(
-      id: id,
-      title: data['title'] as String,
-      isCompleted: data['isCompleted'] as bool? ?? false,
-      completedBy: data['completedBy'] != null
-          ? User.fromJson(data['completedBy'] as Map<String, dynamic>)
-          : null,
-    );
-  }
-
   /// TodoItem을 Firestore 문서로 변환
   Map<String, dynamic> toFirestore() {
     return {
@@ -65,12 +65,6 @@ class User {
     required this.avatarColor,
   });
 
-  /// 사용자 이름
-  final String name;
-
-  /// 아바타 색상
-  final int avatarColor;
-
   /// JSON을 User로 변환
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -78,6 +72,12 @@ class User {
       avatarColor: json['avatarColor'] as int,
     );
   }
+
+  /// 사용자 이름
+  final String name;
+
+  /// 아바타 색상
+  final int avatarColor;
 
   /// User를 JSON으로 변환
   Map<String, dynamic> toJson() {

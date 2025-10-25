@@ -25,21 +25,20 @@ class SharedTodoRepository {
   /// [roomId] 방 ID
   /// Firestore의 변경사항을 실시간으로 감지하여 반환합니다.
   Stream<List<SharedTodoItem>> watchTodosByRoom(String roomId) {
-    return _todosCollection
-        .where('roomId', isEqualTo: roomId)
-        .snapshots()
-        .map((snapshot) {
-          final items = snapshot.docs.map((doc) {
-            return SharedTodoItem.fromFirestore(
-              doc.data(),
-              doc.id,
-            );
-          }).toList();
+    return _todosCollection.where('roomId', isEqualTo: roomId).snapshots().map((
+      snapshot,
+    ) {
+      final items = snapshot.docs.map((doc) {
+        return SharedTodoItem.fromFirestore(
+          doc.data(),
+          doc.id,
+        );
+      }).toList();
 
-          // 클라이언트에서 생성 시간순으로 정렬
-          items.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-          return items;
-        });
+      // 클라이언트에서 생성 시간순으로 정렬
+      items.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      return items;
+    });
   }
 
   /// 새로운 할일을 추가합니다.
