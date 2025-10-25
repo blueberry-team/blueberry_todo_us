@@ -77,27 +77,27 @@ lib/
         ├── models/       # Data models
         ├── screens/      # UI screens
         ├── widgets/      # Feature-specific widgets (optional)
-        └── services/     # API/data layer (optional - see guidelines below)
+        └── repositories/ # API/data layer (optional - see guidelines below)
 ```
 
-### When to Create a Service Layer
+### When to Create a Repository Layer
 
-**Create `services/` when:**
-- Making REST API calls (see `features/github/services/github_service.dart` as example)
+**Create `repositories/` when:**
+- Making REST API calls (see `features/github/services/github_service.dart` as example - note: github feature uses services/ naming but you should use repositories/)
 - Implementing GraphQL queries
 - Working with local databases (SQLite, Hive)
 - Need to abstract complex data operations shared across multiple controllers
+- Using Firebase/Supabase SDKs that benefit from abstraction
 
-**Skip `services/` when:**
-- Using Firebase/Supabase SDKs (call directly from controllers)
+**Skip `repositories/` when:**
 - Managing simple UI state
-- Working with well-designed SDKs that don't need wrapping
+- Simple Firebase calls that don't need abstraction
 
-**Example: REST API pattern (github feature)**
+**Example: REST API pattern (github feature uses Service, but you should use Repository for consistency)**
 
 ```dart
-// ✅ Service 계층 (features/github/services/github_service.dart)
-class GitHubService {
+// ✅ Repository 계층 (features/github/repositories/github_repository.dart)
+class GitHubRepository {
   static const _baseUrl = 'https://api.github.com';
 
   Future<GithubRepoModel> getRepo({
@@ -116,23 +116,23 @@ class GitHubService {
   }
 }
 
-// ✅ Controller에서 Service 사용 (features/github/controllers/github_controller.dart)
+// ✅ Controller에서 Repository 사용 (features/github/controllers/github_controller.dart)
 final githubProvider = AsyncNotifierProvider<GitHubNotifier, GithubRepoModel>(
   GitHubNotifier.new,
 );
 
 class GitHubNotifier extends AsyncNotifier<GithubRepoModel> {
-  final _service = GitHubService();
+  final _repository = GitHubRepository();
 
   @override
   Future<GithubRepoModel> build() {
-    return _service.getRepo(owner: 'blueberry-team', repo: 'blueberry_template');
+    return _repository.getRepo(owner: 'blueberry-team', repo: 'blueberry_template');
   }
 
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
-      () => _service.getRepo(owner: 'blueberry-team', repo: 'blueberry_template'),
+      () => _repository.getRepo(owner: 'blueberry-team', repo: 'blueberry_template'),
     );
   }
 }

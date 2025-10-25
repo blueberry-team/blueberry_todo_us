@@ -10,10 +10,61 @@ class TodoListScreen extends ConsumerWidget {
   /// TodoListScreen 생성자
   const TodoListScreen({super.key});
 
+  /// 할일 추가 다이얼로그를 표시합니다.
+  void _showAddTodoDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController();
+    final colors = context.colors;
+
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Add New Task',
+          style: AppTypography.title.copyWith(
+            color: colors.textPrimary,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'Enter task title',
+            border: OutlineInputBorder(),
+          ),
+          onSubmitted: (value) {
+            if (value.isNotEmpty) {
+              ref.read(todoControllerProvider).add(value);
+              Navigator.of(context).pop();
+            }
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: colors.textSecondary),
+            ),
+          ),
+          FilledButton(
+            onPressed: () {
+              final title = controller.text.trim();
+              if (title.isNotEmpty) {
+                ref.read(todoControllerProvider).add(title);
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
-    final todos = ref.watch(todoProvider);
+    final todosAsync = ref.watch(todoProvider);
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -64,19 +115,31 @@ class TodoListScreen extends ConsumerWidget {
 
           // 할일 리스트
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              itemCount: todos.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 24),
-              itemBuilder: (context, index) {
-                final todo = todos[index];
-                return TodoItemWidget(
-                  item: todo,
-                  onToggle: () {
-                    ref.read(todoProvider.notifier).toggle(todo.id);
-                  },
-                );
-              },
+            child: todosAsync.when(
+              data: (todos) => ListView.separated(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                itemCount: todos.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 24),
+                itemBuilder: (context, index) {
+                  final todo = todos[index];
+                  return TodoItemWidget(
+                    item: todo,
+                    onToggle: () {
+                      ref.read(todoControllerProvider).toggle(todo.id);
+                    },
+                  );
+                },
+              ),
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              error: (error, stack) => Center(
+                child: Text(
+                  'Error: $error',
+                  style: TextStyle(color: colors.error),
+                ),
+              ),
             ),
           ),
 
@@ -84,7 +147,7 @@ class TodoListScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(20),
             child: FloatingActionButton(
-              onPressed: () {},
+              onPressed: () => _showAddTodoDialog(context, ref),
               backgroundColor: colors.primary,
               child: const Icon(Icons.add, size: 24),
             ),

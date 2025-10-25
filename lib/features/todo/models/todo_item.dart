@@ -34,6 +34,27 @@ class TodoItem {
       completedBy: completedBy ?? this.completedBy,
     );
   }
+
+  /// Firestore 문서를 TodoItem으로 변환
+  factory TodoItem.fromFirestore(Map<String, dynamic> data, String id) {
+    return TodoItem(
+      id: id,
+      title: data['title'] as String,
+      isCompleted: data['isCompleted'] as bool? ?? false,
+      completedBy: data['completedBy'] != null
+          ? User.fromJson(data['completedBy'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  /// TodoItem을 Firestore 문서로 변환
+  Map<String, dynamic> toFirestore() {
+    return {
+      'title': title,
+      'isCompleted': isCompleted,
+      'completedBy': completedBy?.toJson(),
+    };
+  }
 }
 
 /// 사용자 데이터 모델
@@ -49,4 +70,20 @@ class User {
 
   /// 아바타 색상
   final int avatarColor;
+
+  /// JSON을 User로 변환
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      name: json['name'] as String,
+      avatarColor: json['avatarColor'] as int,
+    );
+  }
+
+  /// User를 JSON으로 변환
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'avatarColor': avatarColor,
+    };
+  }
 }
